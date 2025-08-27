@@ -1,0 +1,191 @@
+
+
+<section class="hero-section" id="home">
+  <div class="hero-content">
+    <h1 class="hero-title">
+      SMART MARITIME<span class="highlight">REGISTRY</span> PLATFORM
+    </h1>
+    <p class="hero-subtitle">
+      Are you a ship owner seeking a certificate for your vessel? Our secure platform simplifies the process, ensuring compliance with international maritime standards.
+    </p>
+    <p class="hero-tagline">
+      Request your certificate today with ease and efficiency—start here!
+    </p>
+    <div class="cta-buttons">
+      <button class="btn btn-primary" (click)="openCertificateRequestForm()">
+        Request a Certificate
+      </button>
+    </div>
+  </div>
+</section>
+
+<section class="services-section" id="services">
+  <h2>Explore the Maritime Registry Services</h2>
+  <div class="services-container">
+    @for (service of services; track service.title) {
+    <div class="service-card">
+      <h3>{{service.title}}</h3>
+      <p>{{service.description}}</p>
+      <a href="#" class="service-link" (click)="navigateTo(service.link); $event.preventDefault()">
+        LEARN MORE
+      </a>
+    </div>
+    }
+  </div>
+</section>
+
+<app-dashboard-statistics></app-dashboard-statistics>
+
+<section class="news-section" id="news">
+  <h2 class="section-title">Latest News & Notices</h2>
+  <div class="news-grid">
+    <div class="news-card" *ngFor="let news of newsList">
+      <img [src]="news.imageUrl" alt="news image" class="news-image" />
+      <div class="news-meta">
+        <span class="news-date">{{ news.date | date: 'mediumDate' }}</span>
+        <span class="news-tag">{{ news.tag }}</span>
+      </div>
+      <h3>{{ news.title }}</h3>
+      <p>{{ news.content }}</p>
+      <a href="#" class="read-more">Read More →</a>
+    </div>
+  </div>
+</section>
+
+<section class="faq-section" id="faq">
+  <h2 class="section-title">Frequently Asked Questions</h2>
+  <input
+    type="text"
+    class="faq-search"
+    placeholder="Search a question..."
+    [(ngModel)]="searchQuery"
+  />
+  <div class="faq-list">
+    <div class="faq-item" *ngFor="let faq of filteredFaqs(); let i = index">
+      <div class="faq-question" (click)="toggleFAQ(i)">
+        <span>{{ faq.question }}</span>
+        <span class="faq-toggle">{{ faq.open ? '−' : '+' }}</span>
+      </div>
+      <div class="faq-answer" *ngIf="faq.open">
+        {{ faq.answer }}
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-section">
+      <h3>About</h3>
+      <p>Platform for managing the maritime registry and flag state control.</p>
+    </div>
+    <div class="footer-section">
+      <h3>Useful Links</h3>
+      <ul>
+        <li><a routerLink="/">Home</a></li>
+        <li><a routerLink="/services">Services</a></li>
+        <li><a routerLink="/faq">FAQ</a></li>
+        <li><a routerLink="/contact">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h3>Contact</h3>
+      <p>Email: contact&#64;registre-maritime.ma</p>
+      <p>Phone: +212 600 123 456</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 Maritime Registry. All rights reserved.</p>
+  </div>
+</footer>
+
+<div *ngIf="showCertificateRequestForm" class="popup">
+  <div class="popup-card">
+    <h2>Demander un Certificat</h2>
+    
+    
+    <div *ngIf="formErrors" class="form-errors">
+      {{ formErrors }}
+    </div>
+    
+    <form (ngSubmit)="submitCertificateRequestForm()">
+      
+      <div class="form-group">
+        <label for="imo">Numéro IMO</label>
+        <input
+          id="imo"
+          [(ngModel)]="certificateRequestForm.Imo"
+          name="imo"
+          type="number"
+          (ngModelChange)="onImoChange()"
+          required
+          #imoInput="ngModel"
+          [disabled]="isLoading"
+        >
+        <div *ngIf="imoError" class="error-message">
+          {{ imoError }}
+        </div>
+        <div *ngIf="imoInput.touched && !certificateRequestForm.Imo" class="error-message">
+          Le numéro IMO est requis
+        </div>
+      </div>
+      
+      
+      <div class="form-group">
+        <label for="ownerEmail">Email du Propriétaire</label>
+        <input
+          id="ownerEmail"
+          [(ngModel)]="certificateRequestForm.OwnerEmail"
+          name="ownerEmail"
+          type="email"
+          (ngModelChange)="onEmailChange()"
+          required
+          #emailInput="ngModel"
+          [disabled]="isLoading"
+        >
+        <div *ngIf="emailError" class="error-message">
+          {{ emailError }}
+        </div>
+        <div *ngIf="emailInput.touched && !certificateRequestForm.OwnerEmail" class="error-message">
+          L'email du propriétaire est requis
+        </div>
+      </div>
+      
+      
+      <div class="form-group">
+        <label for="certificateType">Type de Certificat</label>
+        <select
+          id="certificateType"
+          [(ngModel)]="certificateRequestForm.Type_Certif_Id"
+          name="certificateType"
+          required
+          #certTypeInput="ngModel"
+          [disabled]="isLoading"
+        >
+          <option value="" disabled selected>Sélectionnez le type de certificat</option>
+          <option value="1">Certificat de Ligne de Charge</option>
+          <option value="2">Certificat de Sécurité des Navires à Passagers</option>
+          <option value="3">Certificat d'Équipement de Sécurité</option>
+          <option value="4">Certificat International de Prévention de la Pollution (MARPOL)</option>
+          <option value="5">Certificat de Sécurité Radio</option>
+          <option value="6">Certificat International de Jauge</option>
+          <option value="7">Certificat de Gestion de la Sécurité (Code ISM)</option>
+          <option value="8">Certificat de Travail Maritime (MLC)</option>
+        </select>
+        <div *ngIf="certTypeInput.touched && !certificateRequestForm.Type_Certif_Id" class="error-message">
+          Le type de certificat est requis
+        </div>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="!isFormValid() || isLoading">
+          <span *ngIf="isLoading">Traitement...</span>
+          <span *ngIf="!isLoading">Soumettre la Demande</span>
+        </button>
+        <button type="button" class="btn-secondary" (click)="cancelCertificateRequestForm()" [disabled]="isLoading">
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

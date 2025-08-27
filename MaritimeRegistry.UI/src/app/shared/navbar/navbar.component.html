@@ -1,0 +1,33 @@
+<div class="top-navbar">
+  <div class="top-navbar-left">
+    Maritime Central Registry is a trade name for Maritime Central Group
+  </div>
+  <div class="top-navbar-right">
+    <div class="dropdown">
+      <label for="flag-state-select">
+        <i class="fas fa-flag flag-icon"></i>
+      </label>
+      <select id="flag-state-select" [(ngModel)]="selectedState" class="dropdown-select">
+        <option *ngFor="let state of flagStates" [value]="state">{{ state }}</option>
+      </select>
+    </div>
+
+    <button (click)="onLogin()" class="login-button">Login</button>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="navbar-left">
+    <img src="assets/images/logo.png" alt="Logo" style=" height: 30px; vertical-align: middle; border-radius: 35%; cursor: pointer;" />
+    <span class="logo-text">SeaReg</span>
+  </div>
+  <div class="navbar-right">
+    <ul class="nav-links">
+      <a routerLink="/home" fragment="home" routerLinkActive="active">Home</a>
+      <a routerLink="/services" fragment="services" routerLinkActive="active">Our Services</a>
+      <a routerLink="/statistics" fragment="statistics" routerLinkActive="active">Statistics</a>
+      <a routerLink="/news" fragment="news" routerLinkActive="active">Latest News</a>
+      <a routerLink="/faq" fragment="faq" routerLinkActive="active">FAQ</a>
+    </ul>
+  </div>
+</nav>

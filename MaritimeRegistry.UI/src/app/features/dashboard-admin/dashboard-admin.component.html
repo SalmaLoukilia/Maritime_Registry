@@ -1,0 +1,885 @@
+<div class="dashboard-container">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h2>SeaReg</h2>
+    </div>
+    <ul class="sidebar-menu">
+      <li class="menu-item" [class.active]="activeSection === 'overview'" (click)="setActiveSection('overview')">
+        <i class="icon">📊</i>
+        <span>Overview</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'users'" (click)="setActiveSection('users')">
+        <i class="icon">👥</i>
+        <span>User Management</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'ships'" (click)="setActiveSection('ships')">
+        <i class="icon">🚢</i>
+        <span>Ship Management</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'certificates'" (click)="setActiveSection('certificates')">
+        <i class="icon">📜</i>
+        <span>Certificate Management</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'inspections'" (click)="setActiveSection('inspections')">
+        <i class="icon">🔍</i>
+        <span>Inspection Management</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'owners'" (click)="setActiveSection('owners')">
+        <i class="icon">👤</i>
+        <span>Ship Owner Management</span>
+      </li>
+      <li class="menu-item" [class.active]="activeSection === 'settings'" (click)="setActiveSection('settings')">
+        <i class="icon">⚙️</i>
+        <span>Settings</span>
+      </li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="admin-profile">
+        <div class="admin-avatar">A</div>
+        <div class="admin-info">
+          <span class="admin-name">{{ adminName || 'User' }}</span>
+          <span class="admin-role">{{ isArmateur ? 'Ship Owner' : 'Administrator' }}</span>
+        </div>
+      </div>
+      <button class="logout-btn" (click)="logout()">
+        <i class="icon">🚪</i>
+        Logout
+      </button>
+    </div>
+  </nav>
+
+
+  <main class="main-content">
+    <header class="content-header">
+      <h1>{{ getSectionTitle() }}</h1>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="refreshData()">
+          <i class="icon">🔄</i>
+          Refresh
+        </button>
+      </div>
+    </header>
+
+    <div class="content-body">
+      <div *ngIf="activeSection === 'overview'" class="section overview-section">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🚢</div>
+            <div class="stat-info">
+              <h3>{{ stats.totalShips }}</h3>
+              <p>Registered Ships</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📜</div>
+            <div class="stat-info">
+              <h3>{{ stats.totalCertificates }}</h3>
+              <p>Active Certificates</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🔍</div>
+            <div class="stat-info">
+              <h3>{{ stats.totalInspections }}</h3>
+              <p>Inspections Completed</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-info">
+              <h3>{{ stats.totalOwners }}</h3>
+              <p>Ship Owners</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+              <h3>{{ stats.scheduledInspections }}</h3>
+              <p>Inspections to Schedule</p>
+            </div>
+          </div>
+        </div>
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Ships by Type</h3>
+            <canvas id="shipsByTypeChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Certificate Compliance</h3>
+            <canvas id="certificateComplianceChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Inspections by Type</h3>
+            <canvas id="certificateComplianceChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Ship Owners by Nationality</h3>
+            <canvas id="ownersByNationalityChart"></canvas>
+          </div>
+        </div>
+        <div class="section-actions">
+          <h3>Quick Actions</h3>
+          <div class="stats-grid">
+            <button class="btn-primary" (click)="addNewShip()" *ngIf="!isArmateur">
+              <i class="icon">🚢</i>
+              Add a Ship
+            </button>
+            <button class="btn-primary" (click)="addNewCertificate()" *ngIf="!isArmateur">
+              <i class="icon">📜</i>
+              Add a Certificate
+            </button>
+            <button class="btn-primary" (click)="requestCertificate()" *ngIf="isArmateur">
+              <i class="icon">📝</i>
+              Request a Certificate
+            </button>
+            <button class="btn-primary" (click)="scheduleInspection()" *ngIf="!isArmateur">
+              <i class="icon">🔍</i>
+              Schedule an Inspection
+            </button>
+            <button class="btn-primary" (click)="addNewOwner()" *ngIf="!isArmateur">
+              <i class="icon">👤</i>
+              Add a Ship Owner
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="activeSection === 'certificate-requests'" class="section certificate-requests-section">
+        <div class="section-actions">
+          <button class="btn-primary" (click)="requestCertificate()" *ngIf="isArmateur">
+            <i class="icon">➕</i>
+            Request Certificate
+          </button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ship IMO</th>
+                <th>Certificate Type</th>
+                <th>Status</th>
+                <th>Submitted Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let req of filteredCertificateRequests">
+                <td>{{ req.Request_Id }}</td>
+                <td>{{ req.Imo }}</td>
+                <td>{{ req.Type_Certif }}</td>
+                <td><span class="status-badge" [ngClass]="req.Status">{{ req.Status }}</span></td>
+                <td>{{ req.Submitted_Date | date }}</td>
+                <td>
+                  <button class="btn-edit" (click)="editCertificateRequest(req)" *ngIf="!isArmateur && req.Status === 'Pending'">✏️</button>
+                  <button class="btn-delete" (click)="deleteCertificateRequest(req)" *ngIf="!isArmateur">🗑️</button>
+                  <button class="btn-approve" (click)="approveCertificateRequest(req)" *ngIf="!isArmateur && req.Status === 'Pending'">✅</button>
+                  <button class="btn-reject" (click)="rejectCertificateRequest(req)" *ngIf="!isArmateur && req.Status === 'Pending'">❌</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      
+        <div *ngIf="showCertificateRequestForm" class="popup">
+          <div class="popup-card">
+            <h2>{{ isEditMode ? 'Edit Certificate Request' : 'Request New Certificate' }}</h2>
+            <form (ngSubmit)="submitCertificateRequestForm()">
+              <div class="form-group">
+                <label for="imo">Ship IMO</label>
+                <select id="imo" [(ngModel)]="certificateRequestForm.Imo" name="imo" required>
+                  <option value="0" disabled>Select Ship</option>
+                  <option *ngFor="let ship of ships" [value]="ship.Imo" [disabled]="isArmateur && !myShips.includes(ship.Imo)">{{ ship.Nom_Navire }} ({{ ship.Imo }})</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="typeCertif">Certificate Type</label>
+                <select id="typeCertif" [(ngModel)]="certificateRequestForm.Type_Certif_Id" name="typeCertif" required>
+                  <option value="0" disabled>Select Type</option>
+                  <option *ngFor="let certType of certificateTypes" [value]="certType.Type_Certif_Id">{{ certType.Nom }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="category">Ship Category</label>
+                <select id="category" [(ngModel)]="certificateRequestForm.Category" name="category" required>
+                  <option value="" disabled>Select Category</option>
+                  <option value="Cargo">Cargo</option>
+                  <option value="Tanker">Tanker</option>
+                  <option value="Passenger">Passenger</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="documents">Documents</label>
+                <input id="documents" type="file" multiple (change)="onFileChange($event)">
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Submit' }}</button>
+                <button type="button" class="btn-secondary" (click)="cancelCertificateRequestForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      
+      <div *ngIf="activeSection === 'users' && !isArmateur" class="section users-section">
+        <div class="section-actions">
+          <button class="btn-primary" (click)="addNewUser()">
+            <i class="icon">➕</i>
+            New User
+          </button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.utilisateur_id }}</td>
+                <td>{{ user.nom_utilisateur }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                  <button class="btn-edit" (click)="editUser(user)">✏️</button>
+                  <button class="btn-delete" (click)="deleteUser(user)">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="showUserForm" class="popup">
+          <div class="popup-card">
+            <h2>{{ isEditMode ? 'Edit User' : 'Add New User' }}</h2>
+            <form (ngSubmit)="submitUserForm()">
+              <div class="form-group">
+                <label for="nom_utilisateur">Name</label>
+                <input id="nom_utilisateur" [(ngModel)]="userForm.nom_utilisateur" name="nom_utilisateur" type="text" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" [(ngModel)]="userForm.email" name="email" type="email" required>
+              </div>
+              <div class="form-group">
+                <label for="role">Role</label>
+                <select id="role" [(ngModel)]="userForm.role" name="role" required>
+                  <option value="0" disabled>Select Role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Agent">Agent</option>
+                  <option value="Armateur">Armateur</option>
+                </select>
+              </div>
+              <div class="form-group" *ngIf="!isEditMode">
+                <label for="mot_de_passe">Password</label>
+                <input id="mot_de_passe" [(ngModel)]="userForm.mot_de_passe" name="mot_de_passe" type="password" required>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn-secondary" (click)="cancelUserForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      
+      <div *ngIf="activeSection === 'ships' && !isArmateur" class="section ships-section">
+        <div class="section-actions">
+          <button class="btn-primary" (click)="addNewShip()">
+            <i class="icon">➕</i>
+            New Ship
+          </button>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>IMO</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Flag</th>
+                <th>Status</th>
+                <th>Owner</th>
+                <th>Port</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let ship of ships">
+                <td>{{ ship.Imo }}</td>
+                <td>{{ ship.Nom_Navire }}</td>
+                <td>{{ ship.Type }}</td>
+                <td>{{ ship.Flag }}</td>
+                <td>{{ ship.Statut }}</td>
+                <td>{{ ship.Owner }}</td>
+                <td>{{ ship.Port }}</td>
+                <td>
+                  <button class="btn-edit" (click)="editShip(ship)">✏️</button>
+                  <button class="btn-delete" (click)="deleteShip(ship)">🗑️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div *ngIf="showShipForm" class="popup">
+          <div class="popup-card">
+            <h2>{{ isEditMode ? 'Edit Ship' : 'Add New Ship' }}</h2>
+            <form (ngSubmit)="submitShipForm()">
+              <div class="form-group">
+                <label for="imo">IMO</label>
+                <input id="imo" [(ngModel)]="shipForm.Imo" name="imo" type="number" required>
+              </div>
+              <div class="form-group">
+                <label for="nom_navire">Ship Name</label>
+                <input id="nom_navire" [(ngModel)]="shipForm.Nom_Navire" name="nom_navire" type="text" required>
+              </div>
+              <div class="form-group">
+                <label for="type_navire">Ship Type</label>
+                <select id="type_navire" [(ngModel)]="shipForm.Type_Navire_Id" name="type_navire" required>
+                  <option value="0" disabled>Select Type</option>
+                  <option *ngFor="let type of shipTypes" [value]="type.Type_Navire_Id">{{ type.Type }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="pavillon">Flag</label>
+                <select id="pavillon" [(ngModel)]="shipForm.Pavillon_Id" name="pavillon" required>
+                  <option value="0" disabled>Select Flag</option>
+                  <option *ngFor="let flag of flags" [value]="flag.Pavillon_Id">{{ flag.Pays }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="statut">Status</label>
+                <select id="statut" [(ngModel)]="shipForm.Statut" name="statut" required>
+                  <option value="0" disabled>Select Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                  <option value="Under Repair">Under Repair</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="armateur">Owner</label>
+                <select id="armateur" [(ngModel)]="shipForm.Armateur_Id" name="armateur" required>
+                  <option value="0" disabled>Select Owner</option>
+                  <option *ngFor="let owner of owners" [value]="owner.Armateur_Id">{{ owner.Nom_Armateur }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="port">Port</label>
+                <select id="port" [(ngModel)]="shipForm.Port_Id" name="port" required>
+                  <option value="0" disabled>Select Port</option>
+                  <option *ngFor="let port of ports" [value]="port.Port_Id">{{ port.Nom_Port }}</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn-secondary" (click)="cancelShipForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      
+      <div *ngIf="activeSection === 'certificates'" class="section certificates-section">
+        <div class="section-actions">
+          <button class="btn-primary" (click)="addNewCertificate()" *ngIf="!isArmateur">
+            <i class="icon">➕</i>
+            New Certificate
+          </button>
+          <button class="btn-primary" (click)="printCertificates()">
+            <i class="icon">🖨️</i>
+            Download PDF
+          </button>
+        </div>
+        <div class="search-bar">
+          <input [(ngModel)]="certificateSearchTerm" placeholder="Search certificates...">
+        </div>
+        <div class="filter-group">
+          <label for="filterShip">Filter by Ship</label>
+          <select id="filterShip" [(ngModel)]="certificateFilterShip">
+            <option value="">All Ships</option>
+            <option *ngFor="let ship of ships" [value]="ship.Imo" [disabled]="isArmateur && !myShips.includes(ship.Imo)">{{ ship.Nom_Navire }}</option>
+          </select>
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Issue Date</th>
+                <th>Expiry Date</th>
+                <th>Ship IMO</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let cert of filteredCertificates">
+                <td>{{ cert.Certificat_Id }}</td>
+                <td>{{ cert.Type_Certif }}</td>
+                <td>{{ cert.Date_Delivrance | date }}</td>
+                <td>{{ cert.Date_Expiration | date }}</td>
+                <td>{{ cert.Imo }}</td>
+                <td><span class="status-badge" [ngClass]="getCertificateStatusClass(cert)">{{ cert.Status }}</span></td>
+                <td>
+                  <button class="btn-edit" (click)="editCertificate(cert)" *ngIf="!isArmateur">✏️</button>
+                  <button class="btn-delete" (click)="deleteCertificate(cert)" *ngIf="!isArmateur">🗑️</button>
+                  <button class="btn-renew" (click)="renewCertificate(cert)" *ngIf="!isArmateur">🔄</button>
+                  <button class="btn-cancel" (click)="cancelCertificate(cert)" *ngIf="!isArmateur && cert.Status !== 'Cancelled'">🚫</button>
+                  <button class="btn-withdraw" (click)="withdrawCertificate(cert)" *ngIf="!isArmateur && cert.Status !== 'Withdrawn'">⛔</button>
+                  <button class="btn-reinstate" (click)="reinstateCertificate(cert)" *ngIf="!isArmateur && cert.Status === 'Withdrawn'">✅</button>
+                  <button class="btn-view" (click)="viewCertificate(cert)">👁️</button>
+                  <button class="btn-download" (click)="downloadCertificatePDF(cert)">📥</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div *ngIf="showCertificateForm" class="popup">
+          <div class="popup-card">
+            <h2>{{ isEditMode ? 'Edit Certificate' : 'Add New Certificate' }}</h2>
+            <form (ngSubmit)="submitCertificateForm()">
+              <div class="form-group">
+                <label for="type_certif">Certificate Type</label>
+                <select id="type_certif" [(ngModel)]="certificateForm.Type_Certif_Id" name="type_certif" required>
+                  <option value="0" disabled>Select Type</option>
+                  <option *ngFor="let certType of certificateTypes" [value]="certType.Type_Certif_Id">{{ certType.Nom }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="date_delivrance">Issue Date</label>
+                <input id="date_delivrance" [(ngModel)]="certificateForm.Date_Delivrance" name="date_delivrance" type="date" required>
+              </div>
+              <div class="form-group">
+                <label for="date_expiration">Expiry Date</label>
+                <input id="date_expiration" [(ngModel)]="certificateForm.Date_Expiration" name="date_expiration" type="date" required>
+              </div>
+              <div class="form-group">
+                <label for="imo">Ship IMO</label>
+                <select id="imo" [(ngModel)]="certificateForm.Imo" name="imo" required>
+                  <option value="0" disabled>Select Ship</option>
+                  <option *ngFor="let ship of ships" [value]="ship.Imo">{{ ship.Nom_Navire }} ({{ ship.Imo }})</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" [(ngModel)]="certificateForm.Status" name="status" required>
+                  <option value="Active">Active</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Withdrawn">Withdrawn</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn-secondary" (click)="cancelCertificateForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div *ngIf="showCertificateView" class="popup">
+          <div class="popup-card">
+            <h2>Certificate Details</h2>
+            <p><strong>ID:</strong> {{ selectedCertificate.Certificat_Id }}</p>
+            <p><strong>Type:</strong> {{ selectedCertificate.Type_Certif }}</p>
+            <p><strong>Issue Date:</strong> {{ selectedCertificate.Date_Delivrance | date }}</p>
+            <p><strong>Expiry Date:</strong> {{ selectedCertificate.Date_Expiration | date }}</p>
+            <p><strong>Ship IMO:</strong> {{ selectedCertificate.Imo }}</p>
+            <p><strong>Status:</strong> {{ selectedCertificate.Status }}</p>
+            <div *ngIf="selectedCertificate.Revalidations && selectedCertificate.Revalidations.length > 0">
+              <h3>Revalidation History</h3>
+              <ul>
+                <li *ngFor="let reval of selectedCertificate.Revalidations">
+                  {{ reval.Date | date }} - {{ reval.Note }}
+                </li>
+              </ul>
+            </div>
+            <button class="btn-secondary" (click)="closeCertificateView()">Close</button>
+          </div>
+        </div>
+      </div>
+
+      
+      <div *ngIf="activeSection === 'inspections' && !isArmateur" class="section inspections-section">
+        <div class="section-actions">
+          <button class="btn-primary" (click)="addNewInspection()">
+            <i class="icon">➕</i>
+            New Inspection
+          </button>
+          <button class="btn-primary" (click)="printInspections()">
+            <i class="icon">🖨️</i>
+            Download PDF
+          </button>
+        </div>
+        <div class="search-bar">
+          <input [(ngModel)]="inspectionSearchTerm" placeholder="Search inspections...">
+        </div>
+        <div class="filter-group">
+          <label for="filterType">Filter by Type</label>
+          <select id="filterType" [(ngModel)]="inspectionFilterType">
+            <option value="">All Types</option>
+            <option value="Initial">Initial</option>
+            <option value="Annual">Annual</option>
+            <option value="Unannounced">Unannounced</option>
+            <option value="After Damage">After Damage</option>
+          </select>
+          <label for="filterShip">Filter by Ship</label>
+          <select id="filterShip" [(ngModel)]="inspectionFilterShip">
+            <option value="">All Ships</option>
+            <option *ngFor="let ship of ships" [value]="ship.Imo">{{ ship.Nom_Navire }}</option>
+          </select>
+          <label for="dateFrom">From</label>
+          <input id="dateFrom" type="date" [(ngModel)]="inspectionDateFrom" name="dateFrom">
+          <label for="dateTo">To</label>
+          <input id="dateTo" type="date" [(ngModel)]="inspectionDateTo" name="dateTo">
+        </div>
+        <div class="data-table">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Date</th>
+                <th>Due Date</th>
+                <th>Result</th>
+                <th>Ship IMO</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let insp of filteredInspections" [ngClass]="insp.Due_Date < now ? 'overdue' : ''">
+                <td>{{ insp.Inspection_Id }}</td>
+                <td>{{ insp.Type }}</td>
+                <td>{{ insp.Date_Visite | date }}</td>
+                <td>{{ insp.Due_Date | date }}</td>
+                <td>{{ insp.Resultat }}</td>
+                <td>{{ insp.Imo }}</td>
+                <td>
+                  <button class="btn-edit" (click)="editInspection(insp)">✏️</button>
+                  <button class="btn-delete" (click)="deleteInspection(insp)">🗑️</button>
+                  <button class="btn-view" (click)="viewInspection(insp)">👁️</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+  
+        <div *ngIf="showInspectionForm" class="popup">
+          <div class="popup-card">
+            <h2>{{ isEditMode ? 'Edit Inspection' : 'Add New Inspection' }}</h2>
+            <form (ngSubmit)="submitInspectionForm()">
+              <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" [(ngModel)]="inspectionForm.Type" name="type" required>
+                  <option value="0" disabled>Select Type</option>
+                  <option value="Initial">Initial</option>
+                  <option value="Annual">Annual</option>
+                  <option value="Unannounced">Unannounced</option>
+                  <option value="After Damage">After Damage</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="date_visite">Visit Date</label>
+                <input id="date_visite" [(ngModel)]="inspectionForm.Date_Visite" name="date_visite" type="date" required>
+              </div>
+              <div class="form-group">
+                <label for="due_date">Due Date</label>
+                <input id="due_date" [(ngModel)]="inspectionForm.Due_Date" name="due_date" type="date" required>
+              </div>
+              <div class="form-group">
+                <label for="resultat">Result</label>
+                <input id="resultat" [(ngModel)]="inspectionForm.Resultat" name="resultat" type="text" required>
+              </div>
+              <div class="form-group">
+                <label for="observations">Observations</label>
+                <textarea id="observations" [(ngModel)]="inspectionForm.Observations" name="observations"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="imo">Ship IMO</label>
+                <select id="imo" [(ngModel)]="inspectionForm.Imo" name="imo" required>
+                  <option value="0" disabled>Select Ship</option>
+                  <option *ngFor="let ship of ships" [value]="ship.Imo">{{ ship.Nom_Navire }} ({{ ship.Imo }})</option>
+                </select>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                <button type="button" class="btn-secondary" (click)="cancelInspectionForm()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <div *ngIf="showInspectionView" class="popup">
+          <div class="popup-card">
+            <h2>Inspection Details</h2>
+            <p><strong>ID:</strong> {{ selectedInspection.Inspection_Id }}</p>
+            <p><strong>Type:</strong> {{ selectedInspection.Type }}</p>
+            <p><strong>Date:</strong> {{ selectedInspection.Date_Visite | date }}</p>
+            <p><strong>Due Date:</strong> {{ selectedInspection.Due_Date | date }}</p>
+            <p><strong>Result:</strong> {{ selectedInspection.Resultat }}</p>
+            <p><strong>Observations:</strong> {{ selectedInspection.Observations }}</p>
+            <p><strong>Ship IMO:</strong> {{ selectedInspection.Imo }}</p>
+            <h3>Inspection History for this Ship</h3>
+            <ul>
+              <li *ngFor="let insp of getInspectionHistory(selectedInspection.Imo)">
+                {{ insp.Date_Visite | date }} - {{ insp.Type }} - {{ insp.Resultat }}
+              </li>
+            </ul>
+            <button class="btn-secondary" (click)="closeInspectionView()">Close</button>
+          </div>
+        </div>
+      </div>
+
+      
+<div *ngIf="activeSection === 'owners' && !isArmateur" class="section owners-section">
+  <div class="section-actions">
+    <button class="btn-primary" (click)="addNewOwner()">
+      <i class="icon">➕</i>
+      New Owner
+    </button>
+  </div>
+  <div class="search-bar">
+    <input [(ngModel)]="ownerSearchTerm" placeholder="Search owners...">
+  </div>
+  <div class="data-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Contact</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let owner of filteredOwners">
+  <td>{{ owner.Armateur_Id }}</td>
+  <td>{{ owner.Nom_Armateur }}</td>
+  <td>{{ owner.Contact }}</td>
+  <td>
+    
+    <pre style="display: none">{{ owner | json }}</pre>
+    <button class="btn-edit" (click)="editOwner(owner)">✏️</button>
+    <button class="btn-delete" (click)="deleteOwner(owner)">🗑️</button>
+    <button class="btn-view" (click)="viewOwner(owner)">👁️</button>
+  </td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div *ngIf="showOwnerForm" class="popup">
+    <div class="popup-card">
+      <h2>{{ isEditMode ? 'Edit Owner' : 'Add New Owner' }}</h2>
+      <form (ngSubmit)="submitOwnerForm()">
+        <div class="form-group">
+          <label for="nom_armateur">Name</label>
+          <input id="nom_armateur" [(ngModel)]="ownerForm.Nom_Armateur" name="nom_armateur" type="text" required>
+        </div>
+        <div class="form-group">
+          <label for="contact">Contact</label>
+          <input id="contact" [(ngModel)]="ownerForm.Contact" name="contact" type="text" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+          <button type="button" class="btn-secondary" (click)="cancelOwnerForm()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <div *ngIf="showOwnerView" class="popup">
+    <div class="popup-card">
+      <h2>Owner Details</h2>
+      <p><strong>ID:</strong> {{ selectedOwner.Armateur_Id }}</p>
+      <p><strong>Name:</strong> {{ selectedOwner.Nom_Armateur }}</p>
+      <p><strong>Contact:</strong> {{ selectedOwner.Contact }}</p>
+      <button class="btn-secondary" (click)="closeOwnerView()">Close</button>
+    </div>
+  </div>
+</div>
+
+
+      
+      <div *ngIf="activeSection === 'settings' && !isArmateur" class="section settings-section">
+        <div class="tabs">
+          <button class="tab" [class.active]="activeCodifTab === 'ports'" (click)="setActiveCodifTab('ports')">Ports</button>
+          <button class="tab" [class.active]="activeCodifTab === 'shipTypes'" (click)="setActiveCodifTab('shipTypes')">Ship Types</button>
+          <button class="tab" [class.active]="activeCodifTab === 'certificateTypes'" (click)="setActiveCodifTab('certificateTypes')">Certificate Types</button>
+          <button class="tab" [class.active]="activeCodifTab === 'flags'" (click)="setActiveCodifTab('flags')">Flags</button>
+        </div>
+        
+        <div *ngIf="activeCodifTab === 'ports'" class="codif-section">
+          <button class="btn-primary" (click)="addNewPort()">Add Port</button>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let port of ports">
+                  <td>{{ port.Port_Id }}</td>
+                  <td>{{ port.Nom_Port }}</td>
+                  <td>
+                    <button class="btn-edit" (click)="editPort(port)">✏️</button>
+                    <button class="btn-delete" (click)="deletePort(port)">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="showPortForm" class="popup">
+            <div class="popup-card">
+              <h2>{{ isEditMode ? 'Edit Port' : 'Add New Port' }}</h2>
+              <form (ngSubmit)="submitPortForm()">
+                <div class="form-group">
+                  <label for="nom_port">Port Name</label>
+                  <input id="nom_port" [(ngModel)]="portForm.Nom_Port" name="nom_port" type="text" required>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                  <button type="button" class="btn-secondary" (click)="cancelPortForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    
+        <div *ngIf="activeCodifTab === 'shipTypes'" class="codif-section">
+          <button class="btn-primary" (click)="addNewShipType()">Add Ship Type</button>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Type</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let type of shipTypes">
+                  <td>{{ type.Type_Navire_Id }}</td>
+                  <td>{{ type.Type }}</td>
+                  <td>
+                    <button class="btn-edit" (click)="editShipType(type)">✏️</button>
+                    <button class="btn-delete" (click)="deleteShipType(type)">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="showShipTypeForm" class="popup">
+            <div class="popup-card">
+              <h2>{{ isEditMode ? 'Edit Ship Type' : 'Add New Ship Type' }}</h2>
+              <form (ngSubmit)="submitShipTypeForm()">
+                <div class="form-group">
+                  <label for="type">Type</label>
+                  <input id="type" [(ngModel)]="shipTypeForm.Type" name="type" type="text" required>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                  <button type="button" class="btn-secondary" (click)="cancelShipTypeForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+        <div *ngIf="activeCodifTab === 'certificateTypes'" class="codif-section">
+          <button class="btn-primary" (click)="addNewCertificateType()">Add Certificate Type</button>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let certType of certificateTypes">
+                  <td>{{ certType.Type_Certif_Id }}</td>
+                  <td>{{ certType.Nom }}</td>
+                  <td>
+                    <button class="btn-edit" (click)="editCertificateType(certType)">✏️</button>
+                    <button class="btn-delete" (click)="deleteCertificateType(certType)">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="showCertificateTypeForm" class="popup">
+            <div class="popup-card">
+              <h2>{{ isEditMode ? 'Edit Certificate Type' : 'Add New Certificate Type' }}</h2>
+              <form (ngSubmit)="submitCertificateTypeForm()">
+                <div class="form-group">
+                  <label for="nom">Name</label>
+                  <input id="nom" [(ngModel)]="certificateTypeForm.Nom" name="nom" type="text" required>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                  <button type="button" class="btn-secondary" (click)="cancelCertificateTypeForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      
+        <div *ngIf="activeCodifTab === 'flags'" class="codif-section">
+          <button class="btn-primary" (click)="addNewFlag()">Add Flag</button>
+          <div class="data-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Country</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let flag of flags">
+                  <td>{{ flag.Pavillon_Id }}</td>
+                  <td>{{ flag.Pays }}</td>
+                  <td>
+                    <button class="btn-edit" (click)="editFlag(flag)">✏️</button>
+                    <button class="btn-delete" (click)="deleteFlag(flag)">🗑️</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div *ngIf="showFlagForm" class="popup">
+            <div class="popup-card">
+              <h2>{{ isEditMode ? 'Edit Flag' : 'Add New Flag' }}</h2>
+              <form (ngSubmit)="submitFlagForm()">
+                <div class="form-group">
+                  <label for="pays">Country</label>
+                  <input id="pays" [(ngModel)]="flagForm.Pays" name="pays" type="text" required>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">{{ isEditMode ? 'Update' : 'Add' }}</button>
+                  <button type="button" class="btn-secondary" (click)="cancelFlagForm()">Cancel</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

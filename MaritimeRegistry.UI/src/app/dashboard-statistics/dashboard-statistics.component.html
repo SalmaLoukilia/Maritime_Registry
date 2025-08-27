@@ -1,0 +1,56 @@
+<div class="dashboard-container" id="statistics">
+  <h2>Ship Statistics by Flag State</h2>
+  
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-ship"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Total Ships</h3>
+        <p class="stat-value">{{ totalShips | number }}</p>
+        <p class="stat-change">
+          <span class="positive">+5%</span> vs last month
+        </p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-list"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Ship Types</h3>
+        <div class="chart-container">
+          <canvas #typeChart></canvas> 
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-card wide-card">
+      <div class="stat-icon">
+        <i class="fas fa-flag"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Distribution by Flag</h3>
+        <div class="chart-container">
+          <canvas #flagChart></canvas> 
+        </div>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
+      <div class="stat-content">
+        <h3>Recently Registered Ships</h3>
+        <ul class="recent-ships">
+          <li *ngFor="let ship of recentShips">
+            {{ ship.name }} <span>({{ ship.flag }})</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
