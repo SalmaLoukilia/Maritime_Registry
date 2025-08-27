@@ -86,7 +86,6 @@ namespace MaritimeRegistry.API.Controllers
 
             try
             {
-                // Check for duplicates
                 if (await _context.Utilisateurs.AnyAsync(u => u.Nom_Utilisateur == request.nom_utilisateur))
                 {
                     return Conflict(new { message = $"Username {request.nom_utilisateur} already exists." });
@@ -96,7 +95,6 @@ namespace MaritimeRegistry.API.Controllers
                     return Conflict(new { message = $"Email {request.email} already exists." });
                 }
 
-                // Validate Role
                 if (string.IsNullOrEmpty(request.role) || !new[] { "Admin", "Agent", "Armateur" }.Contains(request.role))
                 {
                     return BadRequest(new { message = "Invalid role. Allowed roles: Admin, Agent, Armateur." });
@@ -107,7 +105,7 @@ namespace MaritimeRegistry.API.Controllers
                     Nom_Utilisateur = request.nom_utilisateur,
                     Email = request.email,
                     Role = request.role,
-                    Mot_De_Passe = request.mot_de_passe // Should be hashed in production
+                    Mot_De_Passe = request.mot_de_passe 
                 };
 
                 _context.Utilisateurs.Add(user);
@@ -143,7 +141,6 @@ namespace MaritimeRegistry.API.Controllers
                     return NotFound(new { message = $"User with ID {id} not found." });
                 }
 
-                // Check for duplicates (excluding current user)
                 if (await _context.Utilisateurs.AnyAsync(u => u.Nom_Utilisateur == request.nom_utilisateur && u.Utilisateur_Id != id))
                 {
                     return Conflict(new { message = $"Username {request.nom_utilisateur} already exists." });
@@ -159,7 +156,7 @@ namespace MaritimeRegistry.API.Controllers
 
                 if (!string.IsNullOrEmpty(request.mot_de_passe))
                 {
-                    user.Mot_De_Passe = request.mot_de_passe; // Should be hashed
+                    user.Mot_De_Passe = request.mot_de_passe; 
                 }
 
                 await _context.SaveChangesAsync();
@@ -201,7 +198,6 @@ namespace MaritimeRegistry.API.Controllers
         }
     }
 
-    // Request models for better validation
     public class UserCreateRequest
     {
         public string nom_utilisateur { get; set; } = string.Empty;

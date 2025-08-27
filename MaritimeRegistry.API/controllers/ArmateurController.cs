@@ -23,7 +23,6 @@ namespace MaritimeRegistry.API.Controllers
             _logger = logger;
         }
 
-        // GET: api/armateurs
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetArmateurs()
         {
@@ -50,7 +49,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // GET: api/armateurs/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetArmateur(int id)
         {
@@ -81,8 +79,6 @@ namespace MaritimeRegistry.API.Controllers
                 return StatusCode(500, new { message = "An error occurred while fetching the armateur.", details = ex.Message });
             }
         }
-
-        // GET: api/armateurs/{id}/ships
         [HttpGet("{id}/ships")]
         public async Task<ActionResult<IEnumerable<object>>> GetArmateurShips(int id)
         {
@@ -116,7 +112,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // POST: api/armateurs
         [HttpPost]
         public async Task<ActionResult<object>> CreateArmateur([FromBody] Armateur armateur)
         {
@@ -129,7 +124,6 @@ namespace MaritimeRegistry.API.Controllers
 
             try
             {
-                // Vérifier si l'armateur existe déjà
                 var existingArmateur = await _context.Armateurs
                     .FirstOrDefaultAsync(a => a.Nom_Armateur == armateur.Nom_Armateur);
                 
@@ -144,7 +138,6 @@ namespace MaritimeRegistry.API.Controllers
                 
                 _logger.LogInformation("Created armateur with ID {Id}", armateur.Armateur_Id);
                 
-                // Retourner un format cohérent
                 return CreatedAtAction(nameof(GetArmateur), new { id = armateur.Armateur_Id }, new
                 {
                     Armateur_Id = armateur.Armateur_Id,
@@ -159,7 +152,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // PUT: api/armateurs/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArmateur(int id, [FromBody] Armateur armateur)
         {
@@ -184,7 +176,6 @@ namespace MaritimeRegistry.API.Controllers
 
             try
             {
-                // Vérifier si le nouveau nom existe déjà pour un autre armateur
                 var duplicateArmateur = await _context.Armateurs
                     .FirstOrDefaultAsync(a => a.Nom_Armateur == armateur.Nom_Armateur && a.Armateur_Id != id);
                 
@@ -218,7 +209,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // DELETE: api/armateurs/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArmateur(int id)
         {

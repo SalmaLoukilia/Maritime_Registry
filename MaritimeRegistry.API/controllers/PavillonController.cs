@@ -31,8 +31,6 @@ namespace MaritimeRegistry.API.Controllers
             }
 
             pavillon.Pays = pavillon.Pays.Trim().ToLower();
-
-            // Check for existing pavillon
             var existingPavillon = await _context.Pavillons
                 .FirstOrDefaultAsync(p => p.Pays.ToLower() == pavillon.Pays.ToLower());
 

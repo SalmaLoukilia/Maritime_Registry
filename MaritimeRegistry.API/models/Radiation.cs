@@ -19,7 +19,7 @@ namespace MaritimeRegistry.API.Models
         [MaxLength(50)]
         public string Statut_Radiation { get; set; } = null!;
 
-        public DateTime? Date_Effective { get; set; } // Nullable car non requis dans la table
+        public DateTime? Date_Effective { get; set; } 
 
         [Required]
         public int Imo { get; set; }

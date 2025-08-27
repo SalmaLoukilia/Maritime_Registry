@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 namespace MaritimeRegistry.API.Controllers
 {
     [Route("api/[controller]")]
-    // Contrôleur API pour les certificats
     [ApiController]
     [Route("api/[controller]")]
     public class CertificateController : ControllerBase
@@ -23,7 +22,6 @@ namespace MaritimeRegistry.API.Controllers
         {
             try
             {
-                // 1. Vérifier que le navire existe
                 var navire = await _context.Navires
                     .Include(n => n.Armateur)
                     .FirstOrDefaultAsync(n => n.Imo == request.Imo);
@@ -33,30 +31,25 @@ namespace MaritimeRegistry.API.Controllers
                     return NotFound(new { message = "Navire non trouvé." });
                 }
 
-                // 2. Vérifier que l'email correspond au propriétaire
                 if (navire.Armateur?.Contact != request.OwnerEmail)
                 {
                     return BadRequest(new { message = "L'email ne correspond pas au propriétaire du navire." });
                 }
 
-                // 3. Vérifier que le type de certificat est valide
                 var certificatType = GetCertificatTypeName(request.Type_Certif_Id);
                 if (string.IsNullOrEmpty(certificatType))
                 {
                     return BadRequest(new { message = "Type de certificat invalide." });
                 }
 
-                // 4. Vérifier les conditions préalables (statut du navire, inspections, etc.)
                 if (navire.Statut != "Actif")
                 {
                     return BadRequest(new { message = "Le navire doit être actif pour demander un certificat." });
                 }
 
-                // 5. Calculer les dates de délivrance et d'expiration
                 var dateDelivrance = DateTime.Now;
-                var dateExpiration = dateDelivrance.AddYears(1); // Valide 1 an
+                var dateExpiration = dateDelivrance.AddYears(1); 
 
-                // 6. Créer le certificat
                 var certificat = new Certificat
                 {
                     Type_Certif = certificatType,
@@ -68,7 +61,6 @@ namespace MaritimeRegistry.API.Controllers
                 _context.Certificats.Add(certificat);
                 await _context.SaveChangesAsync();
 
-                // 7. Retourner la réponse
                 return Ok(new
                 {
                     message = "Certificat créé avec succès",
@@ -102,7 +94,6 @@ namespace MaritimeRegistry.API.Controllers
         }
     }
 
-    // DTO pour la demande de certificat
     public class CertificateRequestDto
     {
         public int Imo { get; set; }

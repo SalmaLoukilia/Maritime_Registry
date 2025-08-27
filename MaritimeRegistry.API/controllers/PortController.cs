@@ -36,8 +36,6 @@ namespace MaritimeRegistry.API.Controllers
 
             port.Nom_Port = port.Nom_Port.Trim().ToLower();
             port.Pays = port.Pays.Trim().ToLower();
-
-            // Check for existing port
             var existingPort = await _context.Ports
                 .FirstOrDefaultAsync(p => p.Nom_Port.ToLower() == port.Nom_Port.ToLower() && 
                                         p.Pays.ToLower() == port.Pays.ToLower());

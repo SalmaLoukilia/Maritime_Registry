@@ -15,10 +15,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularApp", builder =>
     {
-        builder.WithOrigins("http://localhost:4200") // Port Angular
+        builder.WithOrigins("http://localhost:4200") 
                .AllowAnyMethod()
                .AllowAnyHeader()
-               .AllowCredentials(); // Si nécessaire pour les cookies/auth
+               .AllowCredentials(); 
     });
 });
 
@@ -34,7 +34,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularApp"); // Appliquer CORS avant les contrôleurs
+app.UseCors("AllowAngularApp"); 
 app.UseAuthorization();
 app.MapControllers();
 

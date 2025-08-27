@@ -32,7 +32,6 @@ namespace MaritimeRegistry.API.Controllers
 
             typeNavire.Type = typeNavire.Type.Trim().ToLower();
 
-            // Check for existing type
             var existingType = await _context.TypesNavire
                 .FirstOrDefaultAsync(t => t.Type.ToLower() == typeNavire.Type.ToLower());
 

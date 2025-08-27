@@ -1,4 +1,3 @@
-// controllers/AuthController.cs
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MaritimeRegistry.API.Data;
@@ -33,7 +32,6 @@ namespace MaritimeRegistry.API.Controllers
                     });
                 }
 
-                // Rechercher l'utilisateur dans la base de données
                 var user = await _context.Utilisateurs
                     .Where(u => u.Nom_Utilisateur == request.nom_utilisateur 
                            && u.Mot_De_Passe == request.mot_de_passe)
@@ -55,7 +53,6 @@ namespace MaritimeRegistry.API.Controllers
                     });
                 }
 
-                // Générer un token simple
                 var token = $"maritime_{DateTime.Now.Ticks}_{user.Utilisateur_Id}";
 
                 Console.WriteLine($"Connexion réussie pour: {user.Nom_Utilisateur}, Role: {user.Role}");
@@ -86,7 +83,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // Endpoint pour tester la connexion à la base de données
         [HttpGet("test-db")]
         public async Task<ActionResult> TestDatabase()
         {
@@ -137,7 +133,6 @@ namespace MaritimeRegistry.API.Controllers
 
     }
 
-    // Modèles pour les requêtes/réponses
     public class LoginRequest
     {
         public string nom_utilisateur { get; set; } = string.Empty;

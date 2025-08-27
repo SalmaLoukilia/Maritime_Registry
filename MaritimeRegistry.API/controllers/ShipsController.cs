@@ -18,7 +18,6 @@ namespace MaritimeRegistry.API.Controllers
             _context = context;
         }
 
-        // GET: api/ships
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -54,7 +53,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // GET: api/ships/5
         [HttpGet("{imo:int}")]
         public async Task<IActionResult> Get(int imo)
         {
@@ -93,7 +91,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // POST: api/ships
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Navire ship)
         {
@@ -104,13 +101,11 @@ namespace MaritimeRegistry.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                // Check for duplicate IMO
                 if (await _context.Navires.AnyAsync(n => n.Imo == ship.Imo))
                 {
                     return Conflict(new { message = $"Ship with IMO {ship.Imo} already exists." });
                 }
 
-                // Validate foreign keys
                 if (!await _context.TypesNavire.AnyAsync(t => t.Type_Navire_Id == ship.Type_Navire_Id))
                 {
                     return BadRequest(new { message = $"Invalid Type_Navire_Id {ship.Type_Navire_Id}." });
@@ -156,7 +151,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // PUT: api/ships/5
         [HttpPut("{imo:int}")]
         public async Task<IActionResult> Update(int imo, [FromBody] Navire updatedShip)
         {
@@ -178,7 +172,6 @@ namespace MaritimeRegistry.API.Controllers
                     return NotFound(new { message = $"Ship with IMO {imo} not found." });
                 }
 
-                // Validate foreign keys
                 if (!await _context.TypesNavire.AnyAsync(t => t.Type_Navire_Id == updatedShip.Type_Navire_Id))
                 {
                     return BadRequest(new { message = $"Invalid Type_Navire_Id {updatedShip.Type_Navire_Id}." });
@@ -196,7 +189,6 @@ namespace MaritimeRegistry.API.Controllers
                     return BadRequest(new { message = $"Invalid Port_Id {updatedShip.Port_Id}." });
                 }
 
-                // Update fields
                 existingShip.Nom_Navire = updatedShip.Nom_Navire;
                 existingShip.Statut = updatedShip.Statut;
                 existingShip.Type_Navire_Id = updatedShip.Type_Navire_Id;
@@ -206,7 +198,6 @@ namespace MaritimeRegistry.API.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Reload with related data
                 await _context.Entry(existingShip)
                     .Reference(n => n.Type_Navire).LoadAsync();
                 await _context.Entry(existingShip)
@@ -241,7 +232,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // DELETE: api/ships/5
         [HttpDelete("{imo:int}")]
         public async Task<IActionResult> Delete(int imo)
         {
@@ -260,7 +250,6 @@ namespace MaritimeRegistry.API.Controllers
                     return NotFound(new { message = $"Ship with IMO {imo} not found." });
                 }
 
-                // Check if ship has related records
                 if (ship.Certificats.Any() || ship.Inspections.Any() || ship.Mutations.Any() || 
                     ship.Immatriculations.Any() || ship.Radiations.Any())
                 {
@@ -282,7 +271,6 @@ namespace MaritimeRegistry.API.Controllers
             }
         }
 
-        // GET: api/ships/stats
         [HttpGet("stats")]
         public async Task<IActionResult> GetStats()
         {

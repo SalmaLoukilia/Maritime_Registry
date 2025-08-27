@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MaritimeRegistry.API.Models; // Add this if Certificat is in the same namespace, otherwise use the correct namespace
+using MaritimeRegistry.API.Models; 
 
 namespace MaritimeRegistry.API.Models
 {
@@ -30,13 +30,11 @@ namespace MaritimeRegistry.API.Models
         [ForeignKey("Armateur")]
         public int Armateur_Id { get; set; }
 
-        // Propriétés de navigation optionnelles
         public Type_Navire? Type_Navire { get; set; }
         public Pavillon? Pavillon { get; set; }
         public Port? Port { get; set; }
         public Armateur? Armateur { get; set; }
 
-        // Collections initialisées
         public ICollection<Certificat> Certificats { get; set; } = new HashSet<Certificat>();
         public ICollection<Inspection> Inspections { get; set; } = new HashSet<Inspection>();
         public ICollection<Mutation> Mutations { get; set; } = new HashSet<Mutation>();

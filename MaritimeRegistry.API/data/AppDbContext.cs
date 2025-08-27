@@ -23,7 +23,6 @@ namespace MaritimeRegistry.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Table name mappings
             modelBuilder.Entity<Navire>().ToTable("navires");
             modelBuilder.Entity<Armateur>().ToTable("armateur");
             modelBuilder.Entity<Port>().ToTable("port");
@@ -36,7 +35,6 @@ namespace MaritimeRegistry.API.Data
             modelBuilder.Entity<Radiation>().ToTable("radiation");
             modelBuilder.Entity<Utilisateurs>().ToTable("utilisateurs");
 
-            // Dans OnModelCreating, assurez-vous d'avoir cette configuration :
 modelBuilder.Entity<Utilisateurs>(entity =>
 {
     entity.ToTable("utilisateurs");
@@ -72,7 +70,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
     entity.HasIndex(u => u.Email).IsUnique();
 });
 
-            // Navire configuration
             modelBuilder.Entity<Navire>()
                 .HasKey(n => n.Imo);
             modelBuilder.Entity<Navire>()
@@ -87,7 +84,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasMaxLength(50);
 
-            // Armateur configuration
             modelBuilder.Entity<Armateur>()
                 .HasKey(a => a.Armateur_Id);
             modelBuilder.Entity<Armateur>()
@@ -102,7 +98,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasMaxLength(255);
 
-            // Port configuration
             modelBuilder.Entity<Port>()
                 .HasKey(p => p.Port_Id);
             modelBuilder.Entity<Port>()
@@ -120,7 +115,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .HasIndex(p => new { p.Nom_Port, p.Pays })
                 .IsUnique();
 
-            // Pavillon configuration
             modelBuilder.Entity<Pavillon>()
                 .HasKey(p => p.Pavillon_Id);
             modelBuilder.Entity<Pavillon>()
@@ -134,7 +128,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .HasIndex(p => p.Pays)
                 .IsUnique();
 
-            // Type_Navire configuration
             modelBuilder.Entity<Type_Navire>()
                 .HasKey(t => t.Type_Navire_Id);
             modelBuilder.Entity<Type_Navire>()
@@ -147,8 +140,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
             modelBuilder.Entity<Type_Navire>()
                 .HasIndex(t => t.Type)
                 .IsUnique();
-
-            // Certificat configuration
             modelBuilder.Entity<Certificat>()
                 .HasKey(c => c.Certificat_Id);
             modelBuilder.Entity<Certificat>()
@@ -165,7 +156,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .Property(c => c.Date_Expiration)
                 .IsRequired();
 
-            // Inspection configuration
             modelBuilder.Entity<Inspection>()
                 .HasKey(i => i.Inspection_Id);
             modelBuilder.Entity<Inspection>()
@@ -180,7 +170,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasMaxLength(20);
 
-            // Mutation configuration
             modelBuilder.Entity<Mutation>()
                 .HasKey(m => m.Mutation_Id);
             modelBuilder.Entity<Mutation>()
@@ -191,7 +180,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // Immatriculation configuration
             modelBuilder.Entity<Immatriculation>()
                 .HasKey(i => i.Immatriculation_Id);
             modelBuilder.Entity<Immatriculation>()
@@ -202,7 +190,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-            // Radiation configuration
             modelBuilder.Entity<Radiation>()
                 .HasKey(r => r.Radiation_Id);
             modelBuilder.Entity<Radiation>()
@@ -213,7 +200,6 @@ modelBuilder.Entity<Utilisateurs>(entity =>
                 .IsRequired()
                 .HasMaxLength(50);
 
-            // Relationships
             modelBuilder.Entity<Navire>()
                 .HasOne(n => n.Armateur)
                 .WithMany(a => a.Navires)
